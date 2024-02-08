@@ -4,7 +4,7 @@ import logging
 from aiogram.fsm.storage.memory import MemoryStorage
 
 cfg = {
-    'token': '6075826339:AAF-yGH627OMzQcZAQuQes0PC3K3dB3PUd4',
+    'token': '',
     'db_name': '',  # Замініть на ім'я вашої PostgreSQL бази даних
     'db_user': '',  # Замініть на користувача PostgreSQL бази даних
     'db_password': '',  # Замініть на пароль користувача PostgreSQL бази даних
