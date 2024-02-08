@@ -1,10 +1,11 @@
 from Const import *
+from keybord import *
 
 
 @dp.message_handler(commands=['start'])
 async def hello(message: aiogram.types.Message):
     """command start"""
-    await message.answer(cfg['welcome_message'])
+    await message.answer(cfg['welcome_message'], reply_markup=keyboard)
 
 
 if __name__ == '__main__':
