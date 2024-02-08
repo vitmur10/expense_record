@@ -1,6 +1,4 @@
 import aiogram
-import logging
-
 from aiogram.fsm.storage.memory import MemoryStorage
 
 cfg = {
