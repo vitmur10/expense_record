@@ -17,7 +17,14 @@ async def process_callback(callback_query: aiogram.types.CallbackQuery):
 
 @dp.message_handler(content_types=['text'])
 async def text(message: aiogram.types.Message):
-    await message.answer("Оберіть категорію витрат:", reply_markup=inline_keyboard)
+    if "Категорії" == message.text:
+        await message.answer("Оберіть категорію витрат:", reply_markup=inline_keyboard)
+    elif 'Додати витрату' == message.text:
+        pass
+    elif 'Переглянути витрати' == message.text:
+        pass
+    elif 'Додати категорію' == message.text:
+        pass
 
 
 if __name__ == '__main__':

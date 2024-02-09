@@ -25,15 +25,6 @@ cfg = {
 
 
 # Змінено підключення до PostgreSQL
-"""con = psycopg2.connect(
-    dbname=cfg['db_name'],
-    user=cfg['db_user'],
-    password=cfg['db_password'],
-    host='infotron_postgres',  # Залиште як є, оскільки це ім'я сервісу з Docker Compose
-    port='5432'  # Залиште як є, порт за замовчуванням для PostgreSQL
-)
-cur = con.cursor()
-order = {}"""
 logging.basicConfig(level=logging.INFO)
 bot = aiogram.Bot(token=cfg['token'])
 storage = MemoryStorage()
