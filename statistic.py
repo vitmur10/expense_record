@@ -32,5 +32,18 @@ def send_stats(chat_id):
     #Закриваємо об'єкт графіка)
     plt.close()
 
+def send_costs(category):
+    def get_value_from_key(key_to_find):
+        def hook(dct):
+            if key_to_find in dct:
+                return dct[key_to_find]
+            return dct
+        return hook
 
-send_stats()
+    # Відкриття файлу JSON та завантаження вмісту, використовуючи object_hook
+    with open("data.json", 'r', encoding='utf-8') as file:
+        data = json.load(file, object_hook=get_value_from_key(category))
+
+    print(data)
+
+send_costs("Одяг")
