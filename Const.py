@@ -38,3 +38,14 @@ logging.basicConfig(level=logging.INFO)
 bot = aiogram.Bot(token=cfg['token'])
 storage = MemoryStorage()
 dp = aiogram.Dispatcher(bot, storage=storage)
+
+categories = (
+    'Їжа',
+    'Транспорт',
+    'Житло',
+    'Розваги',
+    'Подарунки',
+    'Одяг',
+    'Медицина',
+    'Інше'
+)
