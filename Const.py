@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 bot = aiogram.Bot(token=cfg['token'])
 storage = MemoryStorage()
 dp = aiogram.Dispatcher(bot, storage=storage)
-
+suma = 0
 categories = (
     'Їжа',
     'Транспорт',
