@@ -46,7 +46,5 @@ def send_costs(category):
     with open("data.json", 'r', encoding='utf-8') as file:
         data = json.load(file, object_hook=get_value_from_key(category))
 
-    print(data)
+    return data
 
-
-send_costs("Одяг")

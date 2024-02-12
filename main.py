@@ -7,25 +7,39 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class Add_cost(StatesGroup):
-    category = State()  # State to store the text of the answer
-    s = State()  # State to store the user ID
+    category = State()
+    s = State()
+    comment = State()
 
 
 @dp.callback_query_handler(state=Add_cost.category)
-async def process_callback_state(callback_query: aiogram.types.CallbackQuery):
+async def process_callback_state(callback_query: aiogram.types.CallbackQuery, state: aiogram.dispatcher.FSMContext):
     async with state.proxy() as data:
         data['category'] = callback_query.data.split('_')[1]
-    await bot.send_message(callback_query.from_user.id, f"Напишіть суму")
+    await bot.send_message(callback_query.from_user.id, "Напишіть суму")
     await Add_cost.next()
 
-@dp.message_handler(state=Add_cost.s)
+
+@dp.message_handler(state=Add_cost.s, content_types=['text'])
 async def add_most_frequently_asked_questions_faculty(message: aiogram.types.Message,
                                                       state: aiogram.dispatcher.FSMContext):
     """Add to FAQ with a button"""
     async with state.proxy() as data:
         data['s'] = message.text
+    await bot.send_message(message.from_user.id, "Напишіть коментар")
+    await Add_cost.next()
+
+
+@dp.message_handler(state=Add_cost.comment, content_types=['text'])
+async def add_most_frequently_asked_questions_faculty(message: aiogram.types.Message,
+                                                      state: aiogram.dispatcher.FSMContext):
+    """Add to FAQ with a button"""
+    async with state.proxy() as data:
+        data['comment'] = message.text
     await state.finish()
-    await message.answer(f"{data['category'], data['s']}")
+    await message.answer(f" Додано витрату на суму {data['s'][0:]} у категорію - {data['category'][0:]}\n{ data['comment'][0:] }")
+
+
 @dp.message_handler(commands=['start'])
 async def hello(message: aiogram.types.Message):
     """command start"""
@@ -36,7 +50,9 @@ async def hello(message: aiogram.types.Message):
 @dp.callback_query_handler(lambda c: c.data.startswith('category_'))
 async def process_callback(callback_query: aiogram.types.CallbackQuery):
     category = callback_query.data.split('_')[1]
-    await bot.send_message(callback_query.from_user.id, f"Ви обрали категорію: {category}")
+    await bot.send_message(callback_query.from_user.id, f"Витрати: {category}\n"
+                                                        f"Сума {sum(send_costs(category=category[2:]).values())}\n"
+                                                        f"{send_costs(category=category[2:])}")
 
 
 @dp.message_handler(content_types=['text'])
