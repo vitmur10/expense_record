@@ -1,13 +1,10 @@
 import logging
 import aiogram
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+import sqlite3
 
 cfg = {
     'token': '6610830289:AAFYd-_43M6vmF2vGhQuRzIO224P9JnmHco',
-    'db_name': '',  # Замініть на ім'я вашої PostgreSQL бази даних
-    'db_user': '',  # Замініть на користувача PostgreSQL бази даних
-    'db_password': '',  # Замініть на пароль користувача PostgreSQL бази даних
-
     'welcome_message': f"""
 Привітік! 😊
 
@@ -21,9 +18,9 @@ cfg = {
     'category':'Категорії',
     'add_category': 'Додати категорію'
 }
+con = sqlite3.connect("bd.db")
+cur = con.cursor()
 
-
-# Змінено підключення до PostgreSQL
 logging.basicConfig(level=logging.INFO)
 bot = aiogram.Bot(token=cfg['token'])
 storage = MemoryStorage()
