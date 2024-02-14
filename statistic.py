@@ -3,23 +3,30 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import io
 
-from Const import bot
-
+from Const import *
 
 def send_stats(chat_id):
-    # Отримуємо дані з json файлу
-    with open("data.json", "r", encoding="utf-8") as file:
-        data = json.load(file)
+    # Отримуємо дані з бд
+    cur.execute(f"""SELECT * FROM records""")
+    data = cur.fetchall()
 
     # Розбиваємо по категоріям та сумуємо їх значення
     datas = {}
-    for p_id, p_info in data.items():
-        for key in p_info:
-            datas[p_id] = datas.get(p_id, 0) + p_info[key]
+
+    for p_info in data:
+        category = p_info[1][2:]
+        datas[category] = datas.get(category, 0) + int(p_info[4])
 
     # Формуємо діаграму
     colors = sns.color_palette('pastel')[0:5]
-    plt.pie(datas.values(), labels=datas.keys(), colors=colors, autopct='%.0f%%')
+
+    #Виведення конретного значення для конкретного ключа, щоб в діаграмі відображалось витрати а не відсоток
+    def format_func(pct):
+        total = sum(datas.values())
+        val = int(pct / 100. * total)
+        return f'{val}'
+
+    plt.pie(datas.values(), labels=datas.keys(), colors=colors, autopct=format_func)
 
     # Створюємо картинку в буфер
     buf = io.BytesIO()
@@ -34,17 +41,10 @@ def send_stats(chat_id):
 
 
 def send_costs(category):
-    def get_value_from_key(key_to_find):
-        def hook(dct):
-            if key_to_find in dct:
-                return dct[key_to_find]
-            return dct
-
-        return hook
-
-    # Відкриття файлу JSON та завантаження вмісту, використовуючи object_hook
-    with open("data.json", 'r', encoding='utf-8') as file:
-        data = json.load(file, object_hook=get_value_from_key(category))
-
-    return data
-
+    # Отримання з бд всіх значень по конкретній категорії
+    try:
+        cur.execute(f"""SELECT * FROM records WHERE category == '{category}'""")
+        data = cur.fetchall()
+        return data
+    except Exception as ex:
+        print(ex)
