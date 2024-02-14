@@ -54,7 +54,6 @@ async def add_most_frequently_asked_questions_faculty(message: aiogram.types.Mes
     con.commit()
 
     # Закриття з'єднання з базою даних
-    con.close()
 
     await state.finish()
     await message.answer(f" Додано витрату на суму {data['s'][0:]} у категорію - {data['category'][0:]}\n{ data['comment'][0:] }")
