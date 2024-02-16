@@ -32,14 +32,12 @@ async def add_most_frequently_asked_questions_faculty(message: aiogram.types.Mes
     await Add_cost.next()
 
 
-
 @dp.message_handler(state=Add_cost.comment, content_types=['text'])
 async def add_most_frequently_asked_questions_faculty(message: aiogram.types.Message,
                                                       state: aiogram.dispatcher.FSMContext):
     """Add to FAQ with a button"""
     async with state.proxy() as data:
         data['comment'] = message.text
-
 
     # SQL-запит для додавання даних
     insert_query = '''
@@ -52,11 +50,10 @@ async def add_most_frequently_asked_questions_faculty(message: aiogram.types.Mes
 
     # Підтвердження виконання запиту та збереження змін
     con.commit()
-
-    # Закриття з'єднання з базою даних
-
     await state.finish()
-    await message.answer(f" Додано витрату на суму {data['s'][0:]} у категорію - {data['category'][0:]}\n{ data['comment'][0:] }")
+    await message.answer(
+        f" Додано витрату на суму {data['s'][0:]} у категорію - {data['category'][0:]}\n{data['comment'][0:]}")
+
 
 @dp.message_handler(commands=['start'])
 async def hello(message: aiogram.types.Message):
@@ -68,9 +65,16 @@ async def hello(message: aiogram.types.Message):
 @dp.callback_query_handler(lambda c: c.data.startswith('category_'))
 async def process_callback(callback_query: aiogram.types.CallbackQuery):
     category = callback_query.data.split('_')[1]
+    records_info = ""
+    s = 0
+    for comment, data, cost in cur.execute(
+            f"""SELECT comment, data ,suma FROM records WHERE category = '{category}'"""):
+        records_info += (f"Дата: {data} | {cost} | {comment}\n"
+                         f"{'-'*50}\n")
+        s += cost
     await bot.send_message(callback_query.from_user.id, f"Витрати: {category}\n"
-                                                        f"Сума {sum(send_costs(category=category[2:]).values())}\n"
-                                                        f"{send_costs(category=category[2:])}")
+                                                        f"Сума: {s}\n"
+                                                        f"{records_info}")
 
 
 @dp.message_handler(content_types=['text'])

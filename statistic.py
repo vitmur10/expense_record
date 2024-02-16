@@ -5,6 +5,7 @@ import io
 
 from Const import *
 
+
 def send_stats(chat_id):
     # Отримуємо дані з бд
     cur.execute(f"""SELECT * FROM records""")
@@ -20,7 +21,7 @@ def send_stats(chat_id):
     # Формуємо діаграму
     colors = sns.color_palette('pastel')[0:5]
 
-    #Виведення конретного значення для конкретного ключа, щоб в діаграмі відображалось витрати а не відсоток
+    # Виведення конретного значення для конкретного ключа, щоб в діаграмі відображалось витрати а не відсоток
     def format_func(pct):
         total = sum(datas.values())
         val = int(pct / 100. * total)
@@ -47,4 +48,5 @@ def send_costs(category):
         data = cur.fetchall()
         return data
     except Exception as ex:
+
         print(ex)
