@@ -6,7 +6,7 @@ import io
 from Const import *
 
 
-def send_stats(chat_id):
+def send_stats():
     # Отримуємо дані з бд
     cur.execute(f"""SELECT * FROM records""")
     data = cur.fetchall()
@@ -16,7 +16,10 @@ def send_stats(chat_id):
 
     for p_info in data:
         category = p_info[1][2:]
-        datas[category] = datas.get(category, 0) + int(p_info[4])
+        try:
+            datas[category] = datas.get(category, 0) + int(p_info[4])
+        except:
+            pass
 
     # Формуємо діаграму
     colors = sns.color_palette('pastel')[0:5]
@@ -24,7 +27,7 @@ def send_stats(chat_id):
     # Виведення конретного значення для конкретного ключа, щоб в діаграмі відображалось витрати а не відсоток
     def format_func(pct):
         total = sum(datas.values())
-        val = int(pct / 100. * total)
+        val = int(pct / 100. * total + 1)
         return f'{val}'
 
     plt.pie(datas.values(), labels=datas.keys(), colors=colors, autopct=format_func)
@@ -34,11 +37,10 @@ def send_stats(chat_id):
     plt.savefig(buf, format='png')
     buf.seek(0)
 
-    # Відправляємо картинку користувачу за допомогою Telegram API
-    bot.send_photo(chat_id=chat_id, photo=buf)
+    # Після надсилання картинки, очищаємо діаграму, щоб пізніше не було конфліктів
+    plt.clf()
 
-    # Закриваємо об'єкт графіка)
-    plt.close()
+    return buf
 
 
 def send_costs(category):

@@ -76,6 +76,36 @@ async def process_callback(callback_query: aiogram.types.CallbackQuery):
                                                         f"Сума: {s}\n"
                                                         f"{records_info}")
 
+@dp.callback_query_handler(lambda d: d.data.startswith('delete_'))
+async def process_callback_for_delete(callback_query: aiogram.types.CallbackQuery):
+    """Отримуємо від користувача категорію витрат,
+    та формуємо кнопки для видалення конкретної витрати"""
+    category = callback_query.data.split('_')[1]
+    buttons = []
+    for comment, data, cost in cur.execute(
+            f"""SELECT comment, data ,suma FROM records WHERE category = '{category}'"""):
+        buttons.append(aiogram.types.InlineKeyboardButton(text=f"Дата: {data} | {cost} | {comment}\n",
+                                                          callback_data=f"cost_{data}_{cost}_{comment}"))
+    delete_cost.add(*buttons)
+    await bot.send_message(callback_query.from_user.id, f"Список витрат за категорією: {category}\n"
+                                                        f"Для видалення витрати оберіть її з списку:",
+                           reply_markup=delete_cost)
+
+
+@dp.callback_query_handler(lambda g: g.data.startswith('cost_'))
+async def delete_select_cost(callback_query: aiogram.types.CallbackQuery):
+    cost_info = callback_query.data.split('_')[1:]
+    try:
+        cur.execute(
+            f"""DELETE FROM records 
+            WHERE data = '{cost_info[0]}' 
+            AND comment = '{cost_info[2]}'
+            AND suma = '{cost_info[1]}'""")
+        # Підтвердження виконання запиту та збереження змін
+        con.commit()
+        await bot.send_message(callback_query.from_user.id, f"Обрану вами витрату було успішно видаленно")
+    except:
+        await bot.send_message(callback_query.from_user.id, f"Виникла помилка!")
 
 @dp.message_handler(content_types=['text'])
 async def text(message: aiogram.types.Message):
@@ -89,6 +119,12 @@ async def text(message: aiogram.types.Message):
     elif 'Додати категорію' == message.text:
         await message.answer("Напишіть категорію")
         categories.append(message.text)
+    elif 'Переглянути статстику витрат' == message.text:
+        buf = send_stats()  # Викликаємо функцію send_stats для отримання картинки
+        await message.answer_photo(buf, caption='Ваші витрати')  # Надсилаємо зображення з підписом
+    elif 'Видалити витрати' == message.text:
+        await message.answer("Оберіть категорію витрат:", reply_markup=delete_category_keyboard)
+
 
 
 if __name__ == '__main__':

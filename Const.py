@@ -16,7 +16,9 @@ cfg = {
     'add_cost': 'Додати витрату',
     'view_costs': 'Переглянути витрати',
     'category':'Категорії',
-    'add_category': 'Додати категорію'
+    'add_category': 'Додати категорію',
+    "view_statistics": "Переглянути статстику витрат",
+    "delete_cost": 'Видалити витрати'
 }
 con = sqlite3.connect("bd.db")
 cur = con.cursor()
